@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adaptive</title>
+    <style>
+      :root {
+        --space: 1rem;
+        --background: oklch(1 0 0);
+        --foreground: oklch(0.145 0 0);
+      }
+
+      .dark {
+        --background: oklch(0.145 0 0);
+        --foreground: oklch(0.985 0 0);
+      }
+
+      body {
+        align-items: center;
+        background-color: var(--background);
+        box-sizing: border-box;
+        color: var(--foreground);
+        display: flex;
+        font-family: system-ui, sans-serif;
+        height: 100svh;
+        justify-content: center;
+        margin: 0;
+        padding: var(--space);
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      // set dark / light mode based on system preference
+      (() => {
+        const pd = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.body.classList.toggle("dark", pd);
+      })();
+    </script>
+    <div>Hi, this is an agent.</div>
+  </body>
+</html>

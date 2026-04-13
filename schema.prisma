@@ -1,0 +1,33 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "./generated"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DB_FILE_NAME")
+}
+
+model User {
+  // Adaptive AI platform columns (do not change)
+  id     String  @id
+  name   String?
+  image  String?
+  handle String?
+
+  // Additional columns can be added here
+}
+
+/// Persisted Discord DM conversation history
+model DiscordMessage {
+  id              Int      @id @default(autoincrement())
+  discordUserId   String
+  discordUsername  String
+  role            String   // "user" or "assistant"
+  content         String
+  discordMessageId String? // Discord's message ID (for replies)
+  createdAt       DateTime @default(now())
+
+  @@index([discordUserId, createdAt])
+}
