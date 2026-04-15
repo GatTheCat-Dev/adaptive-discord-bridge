@@ -28,7 +28,7 @@ It's not a separate bot personality. It's *your* agent, just on Discord.
 
 **DMs** — Message the bot directly. It has full conversation history, remembers context across sessions, and can do anything your Adaptive agent can do: check your calendar, search your email, build things, run code, send files.
 
-**Server @mentions** — @mention the bot in any channel. It pulls the last 50 messages for context, so it understands the conversation it's joining — not just the message that tagged it.
+**Server @mentions** — @mention the bot in any channel. It pulls the conversation for context, so it understands the conversation it's joining — not just the message that tagged it.
 
 **Per-channel memory** — Every server channel gets its own persistent memory file. Important decisions, context, and notes are saved automatically and carried across conversations. The agent can also read other channels' memory for cross-channel awareness.
 
