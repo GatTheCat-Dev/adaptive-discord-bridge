@@ -51,14 +51,15 @@ Tell the user:
 
 > "I need you to create a Discord bot. Go to https://discord.com/developers/applications and:
 > 1. Click **New Application** — name it **Adaptive**
-> 2. Go to **Bot** → click **Reset Token** → copy the token
-> 3. Under **Privileged Gateway Intents**, enable:
+> 2. Copy the **Application ID** from the General Information page (you'll need this)
+> 3. Go to **Bot** → click **Reset Token** → copy the token
+> 4. Under **Privileged Gateway Intents**, enable:
 >    - **Message Content Intent**
 >    - **Server Members Intent** (optional but recommended)
-> 4. Go to **OAuth2 → URL Generator** → check **bot** scope → permissions: **Send Messages**, **Read Message History**, **Attach Files**
-> 5. Copy the generated URL, open it, and invite the bot to any servers you want
 
-Once the user has the token, continue to Step 3b.
+You need both the **Application ID** (client ID) and the **Bot Token** from the user before continuing.
+
+Once the user provides both, continue to Step 3b.
 
 ---
 
@@ -124,7 +125,26 @@ curl http://localhost:<PORT>/rpc/botStatus
 
 ---
 
-## Step 7 — Test It
+## Step 7 — Send the Invite Link
+
+Generate the bot invite URL using the Application ID from Step 3:
+
+```
+https://discord.com/oauth2/authorize?client_id=<APPLICATION_ID>&scope=bot&permissions=117760
+```
+
+Permission value `117760` includes: Send Messages, Read Message History, Attach Files, Embed Links.
+
+Send this link to the user with a message like:
+
+> "Your Adaptive bot is live! Use this link to invite it to any Discord server:
+> <invite URL>
+>
+> You can also DM the bot directly — just find it in your Discord friends list or search for its name."
+
+---
+
+## Step 8 — Test It
 
 Have the user send a DM to the bot on Discord or @mention it in a server channel.
 It should respond within a few seconds.
