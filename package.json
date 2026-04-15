@@ -1,7 +1,7 @@
 {
   "name": "utility-template",
   "private": true,
-  "version": "1.16.0",
+  "version": "1.17.0",
   "type": "module",
   "scripts": {
     "dev:api": "tsx watch --include \"src/api/procedures.ts\" --ignore \"generated/**\" src/api/server.ts 2>&1 | tee -a api-dev.log",
