@@ -50,7 +50,7 @@ This registers the project with the Adaptive platform and assigns it an app ID.
 Tell the user:
 
 > "I need you to create a Discord bot. Go to https://discord.com/developers/applications and:
-> 1. Click **New Application** — name it whatever you like (e.g. "Adaptive")
+> 1. Click **New Application** — name it **Adaptive**
 > 2. Go to **Bot** → click **Reset Token** → copy the token
 > 3. Under **Privileged Gateway Intents**, enable:
 >    - **Message Content Intent**
@@ -58,7 +58,33 @@ Tell the user:
 > 4. Go to **OAuth2 → URL Generator** → check **bot** scope → permissions: **Send Messages**, **Read Message History**, **Attach Files**
 > 5. Copy the generated URL, open it, and invite the bot to any servers you want
 
-Once the user has the token, continue to Step 4.
+Once the user has the token, continue to Step 3b.
+
+---
+
+## Step 3b — Set Bot Name and Avatar
+
+After getting the token, use the Discord API to set the bot's name to "Adaptive" and upload the default avatar.
+
+The default avatar is included in the repo at `.github/bot-avatar.jpg`.
+
+```bash
+# Read the avatar file and base64-encode it
+AVATAR_BASE64=$(base64 -w 0 /home/computer/discord-bridge/.github/bot-avatar.jpg)
+AVATAR_DATA_URI="data:image/jpeg;base64,${AVATAR_BASE64}"
+
+# Update the bot's profile via Discord API
+curl -X PATCH "https://discord.com/api/v10/users/@me" \
+  -H "Authorization: Bot <DISCORD_BOT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d "{\"username\": \"Adaptive\", \"avatar\": \"${AVATAR_DATA_URI}\"}"
+```
+
+Replace `<DISCORD_BOT_TOKEN>` with the token from Step 3.
+
+If the username "Adaptive" is taken or rate-limited, Discord may reject it — that's fine, the user can set the name manually in the Developer Portal. The avatar should always succeed.
+
+Once confirmed, continue to Step 4.
 
 ---
 
