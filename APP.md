@@ -4,7 +4,7 @@
 
 **Type**: utility (persistent bot service)
 
-**Status**: active (V2)
+**Status**: active (v0.2.0)
 
 ## What It Does
 
@@ -14,7 +14,7 @@
 - Forwards everything to the Adaptive agent via `mcp.promptAgent()`
 - This is NOT a separate personality — it's the same Adaptive agent, just on Discord
 
-## V2 Features
+## v0.2.0 Features
 
 - Per-channel memory files at `/home/computer/.memory/adb/{server}/{channel}.md`
 - `_index.json` maps Discord IDs to filesystem slugs
