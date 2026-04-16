@@ -4,7 +4,7 @@
 
 **Type**: utility (persistent bot service)
 
-**Status**: active (v0.2.0)
+**Status**: active (v0.2.1)
 
 ## What It Does
 
@@ -51,3 +51,20 @@
 
 - **Internal**: Adaptive agent via `mcp.promptAgent()` — full computer access
 - **External**: Discord API v10 (REST + Gateway)
+
+## Changelog
+
+### v0.2.1
+- Hardened keep-alive: pings external URL (proxy-routed) instead of localhost, 2-minute interval with retry
+- Added Discord gateway shard event listeners (disconnect, reconnect, resume, error)
+- Added process-level unhandled rejection and uncaught exception handlers
+- Prevents platform idle timeout from killing the bot process
+
+### v0.2.0
+- Per-channel memory files with auto-registration
+- On-demand channel history fetch from Discord API
+- Multi-user attribution in server channels
+- File and image sending via multipart/form-data
+- Server/channel rename handlers
+- Smart DM message classification
+- Cross-channel awareness
