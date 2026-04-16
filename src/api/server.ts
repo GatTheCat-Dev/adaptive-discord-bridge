@@ -43,7 +43,7 @@ serve({
 // Prisma generate triggers tsx file watcher restarts — this delay
 // ensures we only start the bot after the restart cycle settles.
 setTimeout(() => {
-  startDiscordBot(env.DISCORD_BOT_TOKEN, env.VITE_BASE_URL).catch((err) => {
+  startDiscordBot(env.DISCORD_BOT_TOKEN).catch((err) => {
     console.error("[Discord] Failed to start bot:", err);
   });
 }, 8000);

@@ -996,25 +996,42 @@ function handleChannelRename(channelId: string, guildId: string, newName: string
 // Keep-alive self-ping
 // ============================================================
 
-function startKeepAlive(baseUrl: string) {
-  setInterval(
-    async () => {
-      try {
-        await fetch(baseUrl);
-      } catch {
-        // ignore
-      }
-    },
-    3 * 60 * 1000,
-  );
+function startKeepAlive() {
+  const localUrl = `http://localhost:${env.PORT}`;
+  const ping = async () => {
+    try {
+      const res = await fetch(localUrl);
+      if (!res.ok) throw new Error(`status ${res.status}`);
+    } catch (err) {
+      console.warn(`[Keep-Alive] Ping failed: ${err}. Retrying in 10s...`);
+      setTimeout(async () => {
+        try {
+          await fetch(localUrl);
+        } catch (retryErr) {
+          console.error(`[Keep-Alive] Retry also failed: ${retryErr}`);
+        }
+      }, 10_000);
+    }
+  };
+  setInterval(ping, 2 * 60 * 1000);
+  console.log(`[Keep-Alive] Pinging ${localUrl} every 2 minutes`);
 }
 
 // ============================================================
 // Main bot startup
 // ============================================================
 
-export async function startDiscordBot(token: string, baseUrl: string) {
+export async function startDiscordBot(token: string) {
   BOT_TOKEN = token;
+
+  process.on("unhandledRejection", (reason) => {
+    console.error("[Discord] Unhandled rejection:", reason);
+  });
+
+  process.on("uncaughtException", (err) => {
+    console.error("[Discord] Uncaught exception:", err);
+    // Don't exit — let the bot try to keep running
+  });
 
   const client = new Client({
     intents: [
@@ -1032,6 +1049,26 @@ export async function startDiscordBot(token: string, baseUrl: string) {
     console.log(`[Discord] Logged in as ${c.user.tag} (ID: ${c.user.id})`);
     console.log(`[Discord] Bot ready. Listening for DMs + @mentions.`);
     botStartTime = Date.now();
+  });
+
+  client.on("error", (err) => {
+    console.error("[Discord] Client error:", err.message);
+  });
+
+  client.on("shardDisconnect", (event, shardId) => {
+    console.warn(`[Discord] Shard ${shardId} disconnected (code ${event.code}). discord.js will attempt reconnection.`);
+  });
+
+  client.on("shardReconnecting", (shardId) => {
+    console.log(`[Discord] Shard ${shardId} reconnecting...`);
+  });
+
+  client.on("shardResume", (shardId, replayedEvents) => {
+    console.log(`[Discord] Shard ${shardId} resumed. Replayed ${replayedEvents} events.`);
+  });
+
+  client.on("shardError", (err, shardId) => {
+    console.error(`[Discord] Shard ${shardId} error:`, err.message);
   });
 
   client.on("raw", (packet: { t: string; d?: unknown }) => {
@@ -1059,7 +1096,7 @@ export async function startDiscordBot(token: string, baseUrl: string) {
   console.log(`[Discord] Bot login initiated.`);
 
   botClient = client;
-  startKeepAlive(baseUrl);
+  startKeepAlive();
 
   const shutdown = () => {
     console.log("[Discord] Shutting down bot...");
