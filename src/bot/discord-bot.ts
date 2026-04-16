@@ -997,24 +997,51 @@ function handleChannelRename(channelId: string, guildId: string, newName: string
 // ============================================================
 
 function startKeepAlive() {
+  // Must ping the EXTERNAL URL so traffic goes through the platform proxy.
+  // The watchdog only counts proxy-routed requests as activity — localhost
+  // pings don't prevent idle shutdown.
+  const externalUrl = env.VITE_BASE_URL;
   const localUrl = `http://localhost:${env.PORT}`;
+  let consecutiveFailures = 0;
+
   const ping = async () => {
     try {
-      const res = await fetch(localUrl);
+      // Primary: hit external URL through the proxy (this is what keeps us alive)
+      const res = await fetch(externalUrl, { signal: AbortSignal.timeout(15_000) });
       if (!res.ok) throw new Error(`status ${res.status}`);
+      if (consecutiveFailures > 0) {
+        console.log(`[Keep-Alive] Recovered after ${consecutiveFailures} failures`);
+      }
+      consecutiveFailures = 0;
     } catch (err) {
-      console.warn(`[Keep-Alive] Ping failed: ${err}. Retrying in 10s...`);
+      consecutiveFailures++;
+      console.warn(`[Keep-Alive] External ping failed (${consecutiveFailures}x): ${err}`);
+
+      // Fallback: hit localhost as a secondary signal
+      try {
+        await fetch(localUrl, { signal: AbortSignal.timeout(5_000) });
+      } catch {
+        // ignore — localhost fallback is best-effort
+      }
+
+      // Retry the external ping after 15s
       setTimeout(async () => {
         try {
-          await fetch(localUrl);
+          await fetch(externalUrl, { signal: AbortSignal.timeout(15_000) });
+          console.log(`[Keep-Alive] Retry succeeded`);
+          consecutiveFailures = 0;
         } catch (retryErr) {
           console.error(`[Keep-Alive] Retry also failed: ${retryErr}`);
         }
-      }, 10_000);
+      }, 15_000);
     }
   };
+
+  // Ping every 2 minutes — well within the 5-minute idle window.
+  // First ping fires immediately to register activity right after startup.
+  ping();
   setInterval(ping, 2 * 60 * 1000);
-  console.log(`[Keep-Alive] Pinging ${localUrl} every 2 minutes`);
+  console.log(`[Keep-Alive] Pinging ${externalUrl} every 2 minutes`);
 }
 
 // ============================================================
